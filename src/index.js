@@ -1,93 +1,60 @@
 import { h, app } from 'hyperapp';
 import logger from '@hyperapp/logger';
-import Menu from './components/menu';
+import List from './components/list';
+import Message from './components/message';
+import MessageForm from './components/message_form';
 import SectionLoader from './components/section_loader';
 
-const SECTION_HOME = 'home';
-const SECTION_STREAMS = 'streams';
-
-const SECTIONS_CONTENT = {
-    [SECTION_HOME]:     () => import('./sections/home'),
-    [SECTION_STREAMS]:  () => import('./sections/streams'),
-};
-
 function view(state, actions) {
-    const { categories, section, } = state;
+    const { messages, editingMessage } = state;
     return (
         <div>
-            <Menu
-                items={categories}
-                handleClick={item => actions.changeSection(item.section)}
+            <List
+                items={messages}
+                ItemComponent={Message}
             />
-            <div>
-                <SectionLoader
-                    name={section}
-                    state={state}
-                    actions={actions}
-                    sectionsContent={SECTIONS_CONTENT}
-                />
-            </div>
+            <MessageForm
+                message={editingMessage}
+                handleFieldChange={(name, value) => actions.changeEditingMessage({ [name]: value })}
+                handleSubmit={() => actions.addEditingMessage()}
+            />
         </div>
     );
 }
 
 const defaultState = {
-    section: SECTION_HOME,
-    categories: [
+    messages: [
         {
-            name: 'Home',
-            section: SECTION_HOME,
-            url: '#home',
-        },
-        {
-            name: 'Streams',
-            section: SECTION_STREAMS,
-            url: '#streams',
-        },
+            text: 'Hello.',
+        }
     ],
-    form: {
-        firstname: '',
-        secondname: '',
-        email: '',
+    editingMessage: {
+        text: '',
     },
 };
 
 const actions = {
-    changeSection: section => state => {
+    changeEditingMessage: message => state => {
         return {
             ...state,
-            section,
+            editingMessage: {
+                ...state.message,   
+                ...message, 
+            },
         };
     },
 
-    addSection: () => state => {
-        const name = `Section${Math.random()}`;
+    addEditingMessage: () => state => {
         return {
             ...state,
-            categories: [
-                ...state.categories,
-                {
-                    name,
-                    section: null,
-                    url: '#' + name,
-                },
+            messages: [
+                ...state.messages,
+                state.editingMessage,
             ],
+            editingMessage: {
+                text: '',
+            },
         };
-    },
-
-    changeFormField: ({ name, value }) => state => {
-        return {
-            ...state,
-            form: {
-                ...state.form,
-                [name]: value,
-            }
-        };
-    },
-
-    submitForm: () => state => {
-        console.log('form submit', state.form);
-        return state;
     },
 };
 

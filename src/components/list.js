@@ -1,9 +1,8 @@
 import { h } from 'hyperapp';
-import MenuItem from './menu_item';
 
-export default function Menu({
+export default function List({
     items=[],
-    ItemComponent=MenuItem,
+    ItemComponent,
     handleClick,
 }) {
     return (
