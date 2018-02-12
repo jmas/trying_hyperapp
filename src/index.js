@@ -4,37 +4,18 @@ import List from './components/list';
 import Message from './components/message';
 import MessageForm from './components/message_form';
 import SectionLoader from './components/section_loader';
+import SocketIo from 'socket.io-client';
 
-function initTimer({
-    delay=10000,
-    fn,
-}) {
-    let timer = null;
-    return {
-        start() {
-            const tick = () => {
-                fn();
-                timer = setTimeout(tick, delay);
-            };
-            tick();
-        },
-
-        stop() {
-            clearTimeout(timer);
-        },
-    };
-}
-
-const socket = new WebSocket('ws://localhost:3001/');
+const socket = SocketIo();
 
 function view(state, actions) {
     const { messages, editingMessage } = state;
     const handleCreate = () => {
-        socket.onmessage = (event) => {
+        socket.on('messages', ({ messages }) => {
             actions.addMessages({
-                messages: JSON.parse(event.data),
+                messages,
             });
-        };
+        });
     };
     return (
         <div oncreate={handleCreate}>
@@ -91,7 +72,7 @@ const actions = {
     },
 
     addEditingMessage: () => state => {
-        socket.send(JSON.stringify(state.editingMessage));
+        socket.emit('message', { message: state.editingMessage });
         return {
             ...state,
             editingMessage: {
