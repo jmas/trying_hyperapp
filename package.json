@@ -4,8 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel ./src/index.html",
-    "watch": "parcel watch ./src/index.html"
+    "build": "parcel build ./src/index.html --public-url ./",
+    "watch": "parcel watch ./src/index.html",
+    "server": "node ./server.js"
   },
   "keywords": [],
   "author": "",
@@ -110,6 +111,10 @@
     "jsesc": "^0.5.0",
     "json5": "^0.5.1",
     "kind-of": "^3.2.2",
+    "koa": "^2.5.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-router": "^7.4.0",
+    "koa-static": "^4.0.2",
     "lazy-cache": "^1.0.4",
     "lodash": "^4.17.5",
     "lodash.clone": "^4.5.0",
@@ -131,6 +136,7 @@
     "mkdirp": "^0.5.1",
     "ms": "^2.0.0",
     "nan": "^2.8.0",
+    "nodejs-websocket": "^1.7.1",
     "normalize-range": "^0.1.2",
     "num2fraction": "^1.2.2",
     "number-is-nan": "^1.0.1",

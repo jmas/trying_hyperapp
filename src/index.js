@@ -5,10 +5,39 @@ import Message from './components/message';
 import MessageForm from './components/message_form';
 import SectionLoader from './components/section_loader';
 
+function initTimer({
+    delay=10000,
+    fn,
+}) {
+    let timer = null;
+    return {
+        start() {
+            const tick = () => {
+                fn();
+                timer = setTimeout(tick, delay);
+            };
+            tick();
+        },
+
+        stop() {
+            clearTimeout(timer);
+        },
+    };
+}
+
+const socket = new WebSocket('ws://localhost:3001/');
+
 function view(state, actions) {
     const { messages, editingMessage } = state;
+    const handleCreate = () => {
+        socket.onmessage = (event) => {
+            actions.addMessages({
+                messages: JSON.parse(event.data),
+            });
+        };
+    };
     return (
-        <div>
+        <div oncreate={handleCreate}>
             <List
                 items={messages}
                 ItemComponent={Message}
@@ -34,6 +63,23 @@ const defaultState = {
 };
 
 const actions = {
+    updateMessages: ({ messages }) => state => {
+        return {
+            ...state,
+            messages,
+        };
+    },
+
+    addMessages: ({ messages }) => state => {
+        return {
+            ...state,
+            messages: [
+                ...state.messages,
+                ...messages,
+            ],
+        };
+    },
+
     changeEditingMessage: message => state => {
         return {
             ...state,
@@ -45,12 +91,9 @@ const actions = {
     },
 
     addEditingMessage: () => state => {
+        socket.send(JSON.stringify(state.editingMessage));
         return {
             ...state,
-            messages: [
-                ...state.messages,
-                state.editingMessage,
-            ],
             editingMessage: {
                 text: '',
             },
@@ -58,4 +101,4 @@ const actions = {
     },
 };
 
-logger({})(app)(defaultState, actions, view, document.body);
+logger({})(app)(defaultState, actions, view, document.getElementById('app'));

@@ -8,10 +8,9 @@ export default function List({
     return (
         <ul>
             { items.map((item, index) => (
-                <li>
+                <li key={index}>
                     <ItemComponent
                         {...item}
-                        key={index}
                         handleClick={() => handleClick(item)}
                     />
                 </li>
